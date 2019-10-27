@@ -2,6 +2,7 @@ from gestion import Gestion
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+import datetime
 
 
 class Gui():    
@@ -133,8 +134,8 @@ class Gui():
         self.tv_turnos.heading("#5", text="Estado")
         self.tv_turnos.column("#5", minwidth=0, width="80")
         
-        for turno in self.gestion.turnos:
-            self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
+        #for turno in self.gestion.turnos:
+            #self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
         
         self.tv_turnos.place(x=35, y=60)
 
@@ -187,12 +188,28 @@ class Gui():
     def tipo_informe(self):
         s = self.sel.get()
         if s == 1:
-            print ("seleccionaste el primero") #El print es para indicar si funciona 
+            hoy = datetime.datetime.now()
+            filtro = datetime.datetime.strftime(hoy, "%Y/%m/%d") # convierte objeto datetime a str
+            print ("hoy es:", filtro)
+            turnos = self.gestion.turnos_dia(filtro)
+            if turnos:
+                self.cargar_turnos(turnos)
+            else:
+                messagebox.showinfo("", f"No hay turnos pendientes para hoy {filtro}!") # cadena "f" = f" texto {variable}"
+                
         elif s == 2:
             print ("seleccionaste el segundo")
         elif s == 3:
             print ("seleccionaste el tercero")
         #tv_informes
+
+    def cargar_turnos(self, turnos=None):
+        for i in self.tv_informes.get_children():
+            self.tv_informes.delete(i)
+        if not turnos:
+            turnos = self.gestion.turnos
+        for turno in turnos:
+            self.tv_informes.insert("", END, text=turno.paciente.apellido, values=(turno.descripcion, turno.fecha_turno, turno.hora))
         
     def confirmar_paciente(self):
         if self.ep_nombre.get() == "" or self.ep_apellido.get() == "" or self.ep_dni.get() == "" or self.ep_tel.get() == "":
