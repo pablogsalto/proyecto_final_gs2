@@ -78,4 +78,6 @@ class Gestion:
             self.rt.actualizar(turno)
             return True
         return False
-        
+
+    def turnos_dia(self, filtro):
+        return [ turno for turno in self.turnos if turno.busqueda(filtro) ]
