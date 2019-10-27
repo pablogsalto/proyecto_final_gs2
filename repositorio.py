@@ -1,0 +1,43 @@
+import sqlite3
+from paciente import Paciente
+
+class Repositorio:
+    ###Consulta y guarda notas en la BD###
+
+    def __init__(self):
+        self.bd = sqlite3.connect("turnos.db")
+        self.cursor = self.bd.cursor()
+
+    def get_all(self):
+        ### Retorna una lista de objetos Paciente con todas los pacientes que haya guardadas en la BD###
+        lista_pacientes = []
+        consulta = "SELECT id, apellido, nombre, dni, telefono, mail FROM pacientes;"
+        self.cursor.execute(consulta)
+        todos_los_pacientes = self.cursor.fetchall()
+        for id, apellido, nombre, dni, telefono, mail in todos_los_pacientes:
+            if mail:
+                #Crear paciente sin mail
+                lista_pacientes.append(Paciente(apellido, nombre, dni, telefono, mail,id)) #probar y revisar cuando este el objeto paciente
+            else:
+                lista_pacientes.append(Paciente(apellido, nombre, dni, telefono, mail,id))
+        return lista_pacientes
+
+    def guardar(self, pacientes):
+        ###Guarda el paciente en la BD### #probar y revisar!!!
+        consulta = "INSERT INTO pacientes (apellido, nombre, dni, telefono, mail) VALUES (?, ?, ?, ?, ?);"
+        resultado = self.cursor.execute(consulta, [pacientes.apellido, pacientes.nombre, pacientes.dni, pacientes.telefono, pacientes.mail])
+        id_pacientes = resultado.lastrowid
+        self.bd.commit()
+        return id_pacientes
+
+    def actualizar(self, pacientes):
+        ###Actualiza el paciente en la BD###
+        consulta = "UPDATE pacientes SET apellido = ?, nombre = ?, dni = ?, telefono = ?, mail = ? WHERE id = ?;"
+        self.cursor.execute(consulta, [pacientes.apellido, pacientes.nombre, pacientes.dni, pacientes.telefono, pacientes.mail, pacientes.id])
+        self.bd.commit()
+
+    def eliminar(self, pacientes):
+        ###Elimina la nota de la BD###
+        consulta = "DELETE FROM pacientes WHERE id = ?;"
+        self.cursor.execute(consulta, [pacientes.id])
+        self.bd.commit()
