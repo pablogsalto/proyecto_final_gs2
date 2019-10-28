@@ -2,7 +2,7 @@ from gestion import Gestion
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import datetime
+from datetime import datetime, timedelta
 
 
 class Gui():    
@@ -95,7 +95,7 @@ class Gui():
         self.tv_pacientes.heading("#4", text="Teléfono")
         self.tv_pacientes.column("#4", minwidth=0, width="100")
         self.tv_pacientes.heading("#5", text="Mail")
-        self.tv_pacientes.column("#5", minwidth=0, width="100")
+        self.tv_pacientes.column("#5", minwidth=0, width="200")
         for paciente in self.gestion.pacientes:
             self.tv_pacientes.insert("", END, text=paciente.id, values=(paciente.apellido, paciente.nombre, paciente.dni, paciente.telefono, paciente.mail))
         
@@ -110,34 +110,33 @@ class Gui():
         self.image1 = PhotoImage(file="edit.png")
         boton_modificar = Button(p_turnos, text="  Modificar  ", command=self.modificar_turno,
                                  image=self.image1, compound="left", cursor="hand2")
-        boton_modificar.place(x=270, y=530)
+        boton_modificar.place(x=280, y=530)
         
         #Eliminar turno
         self.image2 = PhotoImage(file="clear.png")
         boton_eliminar = Button(p_turnos, text="  Eliminar  ", command=self.eliminar_turno,
                                 image=self.image2, compound="left", cursor="hand2")
-        boton_eliminar.place(x=420, y=530)
+        boton_eliminar.place(x=430, y=530)
 
                    #---------treeview---------
         
 
         self.tv_turnos = ttk.Treeview(p_turnos)
-        self.tv_turnos = ttk.Treeview(p_turnos, height=20, columns=("Paciente", "Descripción", "Fecha", "Hora", "Estado"))
+        self.tv_turnos = ttk.Treeview(p_turnos, height=20, columns=("Paciente", "Descripción", "Fecha", "Hora"))
         self.tv_turnos.heading("#0", text="ID")
         self.tv_turnos.column("#0", minwidth=0, width="40")
         self.tv_turnos.heading("#1", text="Paciente")        
         self.tv_turnos.heading("#2", text="Descripción")
+        self.tv_turnos.column("#2", minwidth=0, width="250")
         self.tv_turnos.heading("#3", text="Fecha")
-        self.tv_turnos.column("#3", minwidth=0, width="100")
+        self.tv_turnos.column("#3", minwidth=0, width="110")
         self.tv_turnos.heading("#4", text="Hora")
-        self.tv_turnos.column("#4", minwidth=0, width="100")
-        self.tv_turnos.heading("#5", text="Estado")
-        self.tv_turnos.column("#5", minwidth=0, width="80")
+        self.tv_turnos.column("#4", minwidth=0, width="110")
         
         #for turno in self.gestion.turnos:
             #self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
         
-        self.tv_turnos.place(x=35, y=60)
+        self.tv_turnos.place(x=40, y=60)
 
         #-----------------Pestaña informes---------------
         
@@ -148,32 +147,37 @@ class Gui():
         self.sel=IntVar() 
         
         #Turnos pendientes
-        info_D=Radiobutton(p_informes, text="Turnos pendientes del dia", value=1,
+        info_1=Radiobutton(p_informes, text="Turnos pendientes para hoy", value=1,
                            variable=self.sel, command=self.tipo_informe, cursor="hand2")
-        info_D.place(x=55, y=40)
+        info_1.place(x=55, y=40)
         
-        #Consultas del mes
-        info_M=Radiobutton(p_informes, text="Consultas finalizadas del mes", value=2,
+        #Para mañana
+        info_2=Radiobutton(p_informes, text="Turnos pendientes para mañana", value=2,
                            variable=self.sel, command=self.tipo_informe, cursor="hand2")
-        info_M.place(x=55, y=60)
+        info_2.place(x=55, y=60)
 
-        #Pacientes pendientes
-        info_P=Radiobutton(p_informes, text="Pacientes pendientes", value=3,
-                           variable=self.sel, command=self.tipo_informe, cursor="hand2")
-        info_P.place(x=55, y=80)
+        #Para X día
+        info_3=Label(p_informes, text="Turnos pendientes para el día:")
+        info_3.place(x=55, y=80)
+        self.dia = Entry(p_informes, width=18)
+        self.dia.place(x=230, y=82)
+        buscar = Button(p_informes, text="Buscar", command = self.info3, cursor="hand2")
+        buscar.place(x=350, y=80)
+        hoy = datetime.now()#
+        ej = datetime.strftime(hoy, "%Y/%m/%d")# Borrar estas lineas una vez funcione todo
+        self.dia.insert(0, ej)#
 
                    #---------treeview------------
 
         self.tv_informes = ttk.Treeview(p_informes)
-        self.tv_informes = ttk.Treeview(p_informes, height=15, columns=("Descripción", "Fecha", "hora", "Estado"))
+        self.tv_informes = ttk.Treeview(p_informes, height=15, columns=("Descripción", "Fecha", "hora"))
         self.tv_informes.heading("#0", text="Paciente")
-        self.tv_informes.heading("#1", text="Descripción")        
+        self.tv_informes.heading("#1", text="Descripción")
+        self.tv_informes.column("#1", minwidth=0, width="280")
         self.tv_informes.heading("#2", text="Fecha")
         self.tv_informes.column("#2", minwidth=0, width="100")
         self.tv_informes.heading("#3", text="Hora")
         self.tv_informes.column("#3", minwidth=0, width="100")
-        self.tv_informes.heading("#4", text="Estado")
-        self.tv_informes.column("#4", minwidth=0, width="80")
         self.tv_informes.place(x=55, y=125)
 
         #-----------------Ventana------------------------
@@ -183,26 +187,46 @@ class Gui():
                            image=self.image4, compound="left", command=self.salir)
         boton_salir.place(x=370, y=595)        
 
-        #-----------------Funciones------------------------
+        #--------------------Funciones de informes------------------------
         
     def tipo_informe(self):
         s = self.sel.get()
         if s == 1:
-            hoy = datetime.datetime.now()
-            filtro = datetime.datetime.strftime(hoy, "%Y/%m/%d") # convierte objeto datetime a str
-            print ("hoy es:", filtro)
+            hoy = datetime.now()
+            filtro = datetime.strftime(hoy, "%Y/%m/%d") # convierte objeto datetime a str
+            #print ("hoy es:", filtro)
             turnos = self.gestion.turnos_dia(filtro)
             if turnos:
                 self.cargar_turnos(turnos)
             else:
                 messagebox.showinfo("", f"No hay turnos pendientes para hoy {filtro}!") # cadena "f" = f" texto {variable}"
-                
-        elif s == 2:
-            print ("seleccionaste el segundo")
-        elif s == 3:
-            print ("seleccionaste el tercero")
-        #tv_informes
 
+        #Informe 2
+        elif s == 2:
+            filtro = None
+            hoy = datetime.now()
+            tomorrow = hoy + timedelta(days=1)
+            filtro = datetime.strftime(tomorrow, "%Y/%m/%d")
+            turnos = self.gestion.turnos_dia(filtro)
+            if turnos:
+                self.cargar_turnos(turnos)
+            else:
+                messagebox.showinfo("", f"No hay turnos pendientes para mañana {filtro}!")
+
+        #Informe 3
+    def info3 (self):
+        if self.dia.get() == "":
+            messagebox.showwarning("", "Por favor ingrese una fecha Ej: 2019/10/28")
+        else:
+            filtro = self.dia.get()
+            turnos = self.gestion.turnos_dia(filtro)
+            if turnos:
+                self.cargar_turnos(turnos)
+            else:
+                messagebox.showinfo("", f"No hay turnos pendientes para el día {filtro}!")
+
+        #---------------------------Funciones--------------------------
+            
     def cargar_turnos(self, turnos=None):
         for i in self.tv_informes.get_children():
             self.tv_informes.delete(i)
