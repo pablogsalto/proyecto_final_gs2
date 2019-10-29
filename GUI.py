@@ -199,6 +199,7 @@ class Gui():
             if turnos:
                 self.cargar_turnos(turnos)
             else:
+                self.tv_informes.delete(*self.tv_informes.get_children()) # deja vacio el treeview
                 messagebox.showinfo("", f"No hay turnos pendientes para hoy {filtro}!") # cadena "f" = f" texto {variable}"
 
         #Informe 2
@@ -211,6 +212,7 @@ class Gui():
             if turnos:
                 self.cargar_turnos(turnos)
             else:
+                self.tv_informes.delete(*self.tv_informes.get_children())
                 messagebox.showinfo("", f"No hay turnos pendientes para mañana {filtro}!")
 
         #Informe 3
@@ -224,6 +226,7 @@ class Gui():
             if turnos:
                 self.cargar_turnos(turnos)
             else:
+                self.tv_informes.delete(*self.tv_informes.get_children())
                 messagebox.showinfo("", f"No hay turnos pendientes para el día {filtro}!")
 
         #---------------------------Funciones--------------------------
@@ -428,11 +431,10 @@ class Gui():
                 b_ok3.place(x=390, y=300)
                 b_cancelar3 = Button(self.modTurno, text = "Cancelar", compound="left", cursor="hand2", command = self.modTurno.destroy)
                 b_cancelar3.place(x=190, y=300)
-                ## borrar estas lineas una vez funcione todo bien
-                self.n_hora.insert(0, "15:00:00")
-                self.n_fecha.insert(0, "2019/11/20")
-                self.n_desc.insert(0, "qwerty")
-                ##
+                ## carga los datos a modificar
+                self.n_hora.insert(0, turno.hora)
+                self.n_fecha.insert(0, turno.fecha_turno)
+                self.n_desc.insert(0, turno.descripcion)
             
     def boton_ok3(self, event=None, turnos=None):
         elem = self.tv_turnos.selection()

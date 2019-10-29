@@ -69,7 +69,7 @@ class Gestion:
             turno.hora = hora
             turno.descripcion = descripcion
             self.rt.actualizar(turno)
-            self.turnos.append(turno)
+            #self.turnos.append(turno) #29/10 eliminado, corrigió error al actualizar el treeview
             return True
         return False
 
