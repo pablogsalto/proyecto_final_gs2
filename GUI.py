@@ -133,8 +133,8 @@ class Gui():
         self.tv_turnos.heading("#4", text="Hora")
         self.tv_turnos.column("#4", minwidth=0, width="110")
         
-        #for turno in self.gestion.turnos:
-            #self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
+        for turno in self.gestion.turnos:
+            self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
         
         self.tv_turnos.place(x=40, y=60)
 
@@ -215,6 +215,7 @@ class Gui():
 
         #Informe 3
     def info3 (self):
+        filtro = None
         if self.dia.get() == "":
             messagebox.showwarning("", "Por favor ingrese una fecha Ej: 2019/10/28")
         else:
@@ -373,6 +374,8 @@ class Gui():
         #print(int(self.tv_pacientes.item(elem)['text']))
         turno = self.gestion.asignar_turno(id, self.a_fecha.get(), self.a_hora.get(), self.a_desc.get())
         self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora))
+        messagebox.showinfo(message="Su turno ha sido guardado")
+        self.asign.destroy()
                         
     def eliminar_turno(self):
         if not self.tv_turnos.selection():
@@ -410,7 +413,7 @@ class Gui():
                 label_help = Label(self.modTurno, text="Ingrese la fecha del turno en el siguiente formato: AAAA/MM/DD", fg="gray")
                 label_help.place(x=130, y=145)
                 #Hora
-                self.n_hora = Entry(self.asign, width=75)
+                self.n_hora = Entry(self.modTurno, width=75)
                 self.n_hora.place(x=130, y=175)
                 label_hora = Label(self.modTurno, text="Hora:").place(x=60, y=175)
                 label_help = Label(self.modTurno, text="Ingrese la hora del turno en el siguiente formato: HH:MM:SS", fg="gray")
@@ -420,29 +423,28 @@ class Gui():
                 self.n_desc.place(x=130, y=225)
                 label_desc = Label(self.modTurno, text="Descripción:").place(x=60, y=225)
                 #botones  no olvidar agregar y definir el comando para el boton_ok3              !!!!!
-                b_ok3 = Button(self.modTurno, text="Guardar", compound="left", cursor="hand2")
+                b_ok3 = Button(self.modTurno, text="Guardar", compound="left", cursor="hand2", command = self.boton_ok3)
                 self.modTurno.bind("<Return>", self.boton_ok3)
                 b_ok3.place(x=390, y=300)
                 b_cancelar3 = Button(self.modTurno, text = "Cancelar", compound="left", cursor="hand2", command = self.modTurno.destroy)
                 b_cancelar3.place(x=190, y=300)
-
-                #   !!! Borrar estas lineas una vez que funcione todo bien, es para agilizar las purebas
-                self.n_hora.insert(0, "20:00:00")
+                ## borrar estas lineas una vez funcione todo bien
+                self.n_hora.insert(0, "15:00:00")
                 self.n_fecha.insert(0, "2019/11/20")
-                self.n_desc.insert(0, "qwert")
-                # --------------------------------
+                self.n_desc.insert(0, "qwerty")
+                ##
             
     def boton_ok3(self, event=None, turnos=None):
         elem = self.tv_turnos.selection()
         id = int(self.tv_turnos.item(elem)['text'])
         self.gestion.modificar_turno(id, self.n_fecha.get(), self.n_hora.get(), self.n_desc.get())
 
-        for i in self.tv_turnos.get_children():
-            self.tv_turnos.delete(i)
+        for item in self.tv_turnos.get_children():
+            self.tv_turnos.delete(item)
         if not turnos:
             turnos = self.gestion.turnos
         for turno in turnos:
-            self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora), iid=turno.id)
+            self.tv_turnos.insert("", END, text=turno.id, values=(turno.paciente.apellido, turno.descripcion, turno.fecha_turno, turno.hora)) #29/10 eliminado , iid=turno.id
         self.modTurno.destroy()
     
     def salir(self):        

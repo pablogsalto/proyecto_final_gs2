@@ -41,3 +41,21 @@ class Repositorio:
         consulta = "DELETE FROM pacientes WHERE id = ?;"
         self.cursor.execute(consulta, [pacientes.id])
         self.bd.commit()
+
+    def get_one(self, id_paciente):
+        consulta = "SELECT id, apellido, nombre, dni, telefono, mail FROM pacientes WHERE id=?;"
+        self.cursor.execute(consulta,[id_paciente])
+        datos_paciente = self.cursor.fetchone()
+        id = datos_paciente[0]
+        apellido = datos_paciente[1]
+        nombre = datos_paciente[2]
+        dni = datos_paciente[3]
+        telefono =  datos_paciente[4]
+        mail = datos_paciente[5]
+        p = Paciente(apellido, nombre, dni, telefono, mail,id)
+        return p
+
+
+
+
+
