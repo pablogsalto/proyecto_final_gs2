@@ -18,7 +18,7 @@ class Repositorio_Turno:
         todos_los_turnos = self.cursor.fetchall()
         for id, descripcion,  fecha_creacion, fecha_turno, hora, id_paciente in todos_los_turnos:
             paciente = self.rp.get_one(id_paciente)
-            lista_turnos.append(Turno(paciente, fecha_turno, hora, descripcion, id_paciente))
+            lista_turnos.append(Turno(paciente, fecha_turno, hora, descripcion, id))
         return lista_turnos
 
     def guardar (self, turnos):
@@ -37,6 +37,7 @@ class Repositorio_Turno:
 
     def eliminar (self, turnos):
         ###Elimina el turno de la BD###
+        print(turnos.id)
         consulta = "DELETE FROM turnos WHERE id = ?;"
         self.cursor.execute(consulta, [turnos.id])
         self.bd.commit()
